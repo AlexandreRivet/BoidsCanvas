@@ -1,0 +1,163 @@
+@font-face {
+    font-family: 'LeagueGothic';
+    src: url('leaguegothic.eot');
+    src: url('leaguegothic.eot?#iefix') format('embedded-opentype'),
+			url('leaguegothic.svg#caviar_dreamsbold') format('svg'),
+         url('leaguegothic.woff') format('woff'),
+         url('leaguegothic.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+}
+
+html, body, #content {
+	width: 100%;
+	font-family: "LeagueGothic";
+}
+
+h1 {
+	text-align: center;
+	font-size: 72pt;
+	padding: 10px 20px;
+	background-color: rgba(0,0,0,0.4);
+	color: rgba(101,134,151,0.9);
+	text-shadow: -2px -2px 0 #fff,  2px -2px 0 #fff, -2px  2px 0 #fff, 2px  2px 0 #fff;
+	margin-bottom: 15px;
+}
+
+.name {
+	display: inline-block;
+	font-size: 27pt;
+	text-shadow: -1px -1px 0 #fff,  1px -1px 0 #fff, -1px  1px 0 #fff, 1px  1px 0 #fff;
+}
+
+.mini {
+	color: rgba(250,250,250,1);
+	padding-left: 2px;
+	padding-right: 2px;
+	text-shadow: 0px 0px 0 transparent;
+}
+
+body {
+	background: url('wp.jpg') fixed no-repeat;
+	background-size: cover;
+}
+
+#all {
+	display: table;
+	width: 95%;
+}
+
+#content {
+	display: table-cell;
+	text-align: center;
+	width: 50%;
+}
+
+.helper {
+	margin-right: 5px;
+	cursor: pointer;
+}
+
+.helper_img {
+	display: none;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+}
+
+#time_execution {
+	width: 100%;
+	margin-bottom: 5px;
+	
+	text-align: center;
+	font-family: Calibri;
+	font-size: 18pt;
+}
+
+.value_variable {
+	display: inline-block;
+	text-align: right;
+	min-width: 75px;
+}
+
+.options {
+	display: table-cell;
+	width: 50%;
+	min-width: 500px;
+	font-size: 10pt;
+	vertical-align: middle;
+	padding: 10px 55px;
+	border: solid 2px white;
+	background-color: rgba(250,250,250,0.1);
+}
+
+.options label {
+	font-family: Calibri;
+	font-weight: 100;
+	font-size: 18pt;
+	color: rgba(0,0,0,0.8);
+	margin-bottom: 2px;
+}
+
+#canvas {
+	border: solid 2px white;
+	background-color: rgba(250,250,250,0.1);
+	cursor: none;
+}
+
+#start-stop {
+	width: 100%;
+	text-align: center;
+}
+
+input[type="button"] {
+	cursor: pointer; 
+	background: transparent; 
+	border:1px solid rgba(101,134,151,0.9); 
+	display:inline-block; color:#111111; 
+	font-family:Arial; font-size:15px; 
+	font-weight:bold; 
+	font-style:normal; 
+	height:60px; 
+	line-height:60px;
+	width:115px;
+	text-decoration:none;
+	text-align:center;
+	text-shadow:1px 1px 0px #7cacde;
+}
+
+input[type="button"]:hover {
+	background-color: rgba(101,134,151,0.9);;
+}
+
+input[type="button"]:active {
+	position:relative;
+	top:1px;
+}
+
+.radio_area {
+	display: inline-block;
+	
+	font-family: Calibri;
+	font-weight: 100;
+	font-size: 18pt;
+	color: rgba(0,0,0,0.8);	
+}
+
+.detection_checkbox {
+	margin-left: 10px;
+}
+
+.ui-slider{
+	width: 100%;
+}
+
+#controls {
+	text-align: center;
+	margin-left: 30px;
+}

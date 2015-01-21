@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<title>Boids</title>
+	
+	<link rel="stylesheet" href="libs/jquery-ui-1.11.2/jquery-ui.css">
+	<link rel="stylesheet" href="css/main-style.css">
+	<link rel="icon" type="image/png" href="images/boid_icon.png">
+	
+	<script type="text/javascript" src="libs/jquery-1.11.2.min.js"></script>
+	<script type="text/javascript" src="libs/jquery-ui-1.11.2/jquery-ui.js"></script>
+	
+	<script type="text/javascript" src="js/ImageManager.js"></script>	
+	<script type="text/javascript" src="js/Boids.js"></script>
+	<script type="text/javascript" src="js/Main.js"></script>
+	<script type="text/javascript" src="js/Helper.js"></script>
+	
+</head>
+
+<body>
+	<div id="mask"></div>
+	<h1>BOIDS<span class="mini"> IN </span>CANVAS<span class="mini"> BY </span><div class="name"><div>Alexandre RIVET</div><div>Maxime HELAINE</div></div></h1>
+	<section id="all">
+		<section id="content">
+			<canvas id="canvas" height="550" width="700" oncontextmenu="return false;">Your browser doesn't support the <canvas> tag.</canvas>
+		</section>
+		
+		<section class="options">
+			<div id="time_execution">Execution time:&nbsp;<span id="TimeExecutionValue" class="value_variable">0s</span> - Time processing:&nbsp;<span id="TimeProcessingValue" class="value_variable">0ms</span></div><br/>
+			<div id="start-stop">
+				<input type="button" id="button_play" value="PLAY">
+				<input type="button" id="button_pause" value="PAUSE">
+			</div>
+			<br/>
+			<label for="NumBoids">Boids: <span id="NumBoidsValue">50</span></label><div id="NumBoids"></div><br/>
+			<label for="Alignment"><img src="images/helper.png" id="alignment_helper" class="helper">Alignment: <span id="AlignmentValue">1</span></label><div id="Alignment"></div><br/>
+			<label for="Cohesion"><img src="images/helper.png" id="cohesion_helper" class="helper">Cohesion: <span id="CohesionValue">2</span></label><div id="Cohesion"></div><br/>
+			<label for="Separation"><img src="images/helper.png" id="separation_helper" class="helper">Separation: <span id="SeparationValue">4</span></label><div id="Separation"></div><br/>
+			<label for="SeparationDistance">Separation distance: <span id="SeparationDistanceValue">25</span></label><div id="SeparationDistance"></div><br/>
+			<label for="TypeOfDetection">Detection type: </label>
+			<div id="TypeOfDetection" class="radio_area">
+				<input type="radio" name="radio_dectection" value="0" class="detection_checkbox" checked> None 
+				<input type="radio" name="radio_dectection" value="1" class="detection_checkbox"> Death 
+				<input type="radio" name="radio_dectection" value="2" class="detection_checkbox"> Collision 
+			</div><br/><br/>
+			<label for="Debug">Debug options: </label>
+			<div id="Debug" class="radio_area">
+				<input type="radio" name="radio_debug" value="0" class="detection_checkbox" checked> None 
+				<input type="radio" name="radio_debug" value="1" class="detection_checkbox"> Label
+				<input type="radio" name="radio_debug" value="2" class="detection_checkbox"> Position
+				<input type="radio" name="radio_debug" value="3" class="detection_checkbox"> Raycast
+			</div>
+		</section>
+	</section>
+	<div id="controls">
+		<img src="images/left_mouse.png" width="45" height="45"> : Set target to boids<img src="images/right_mouse.png" width="45" height="45"> : Add / Remove obstacles
+	</div>
+	
+	<div id="alignment_helper_img" class="helper_img"><img src="images/alignment_helper.png"></div>
+	<div id="cohesion_helper_img" class="helper_img"><img src="images/cohesion_helper.png"></div>
+	<div id="separation_helper_img" class="helper_img"><img src="images/separation_helper.png"></div>
+	
+</body>
+
+</html>
