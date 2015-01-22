@@ -6,13 +6,13 @@ var BoidsController = function(canvas)
 	
 	this.mOptions = 
 	{
-		Alignment: 2,
-		Cohesion: 1,
+		Alignment: 1,
+		Cohesion: 2,
 		Separation: 5,
-		SeparationDistance: 20,
-		MinSpeed: 1,
+		SeparationDistance: 50,
+		MinSpeed: 3,
 		MaxSpeed: 5,
-		NumBoids: 50,
+		NumBoids: 20,
 	};
 	
 	this.mBoids = new Array();
@@ -89,36 +89,36 @@ BoidsController.prototype.init = function()
 	
 	$("#Cohesion").slider({
 		min: 0,
-		max: 20, 
-		value: 1,
+		max: 5, 
+		value: 2,
 		slide: function(event, ui) { context.updateOptions("Cohesion", ui.value); }
 	});
 	
 	$("#Alignment").slider({
 		min: 0,
 		max: 5, 
-		value: 2,
+		value: 1,
 		slide: function(event, ui) { context.updateOptions("Alignment", ui.value); }
 	});
 	
 	$("#Separation").slider({
 		min: 0,
 		max: 5, 
-		value: 4,
+		value: 5,
 		slide: function(event, ui) { context.updateOptions("Separation", ui.value); }
 	});
 	
 	$("#SeparationDistance").slider({
 		min: 0,
 		max: 100, 
-		value: 25,
+		value: 50,
 		slide: function(event, ui) { context.updateOptions("SeparationDistance", ui.value); }
 	});
 	
 	$("#NumBoids").slider({
 		min: 10,
 		max: 200, 
-		value: 50,
+		value: 20,
 		slide: function(event, ui) { context.updateOptions("NumBoids", ui.value); }
 	});
 	
@@ -188,12 +188,10 @@ BoidsController.prototype.updateClock = function()
 BoidsController.prototype.animateFrame = function()
 {
 	var ctx = this.mContext;
-	
 	ctx.clearRect(0, 0, this.mCanvas.width, this.mCanvas.height);
 	
 	// Draw obstacles
 	var obstacle = 0, size = 0;
-	
 	var alpha = (this.mDetectionMode == 0) ? 0.1 : 1;
 	for (var i in this.mObstacles)
 	{
@@ -206,7 +204,7 @@ BoidsController.prototype.animateFrame = function()
 		ctx.strokeStyle = 'rgba(0, 0, 100, ' + alpha + ')';
 		ctx.stroke();
 		
-		ctx.fillStyle = 'rgba(0, 0, 0, ' + alpha + ')';
+		ctx.fillStyle = 'rgba(255, 255, 255, ' + alpha + ')';
 		size = ctx.measureText(obstacle.count);
 		ctx.fillText(obstacle.count, obstacle.x - (size.width / 2), obstacle.y + 5);
 	}
@@ -222,11 +220,8 @@ BoidsController.prototype.animateFrame = function()
 	
 	// Draw Target
 	this.drawTarget();
-	
-	// Draw information
-	if (!this.mDebugMode)
-		return;
-		
+
+	// Draw FPS
 	ctx.fillStyle = 'black';
 	ctx.fillText("FPS: " + Math.clamp(0, Math.floor(1000 / this.mTimeProcessing), 60), 2, 10);
 };
@@ -259,8 +254,11 @@ BoidsController.prototype.calc = function()
 	var average = 0;
 	var tx, ty;
 	for (var i in this.mBoids)
-	{
+	{		
 		boid = this.mBoids[i];
+		if (boid.mHitPoint.obstacleHitted == true && boid.mHitPoint.distanceHitted < 50)
+			continue;		
+		
 		average = boid.calc(this.mBoids);
 		tx = boid.vx;
 		ty = boid.vy;
@@ -347,6 +345,7 @@ BoidsController.prototype.updateFromObstacles = function()
 			this.mBoids[i].mHitPoint.y = this.mBoids[i].y + this.mBoids[i].vy * offset;		
 			this.mBoids[i].mHitPoint.obstacleHitted = false;	
 			this.mBoids[i].mHitPoint.distanceHitted = 0.0;
+			this.mBoids[i].mHitPoint.obstacleIndex = -1;
 			while(this.mBoids[i].mHitPoint.x >= 0 && this.mBoids[i].mHitPoint.x <= this.mCanvas.width &&
 				this.mBoids[i].mHitPoint.y >= 0 && this.mBoids[i].mHitPoint.y <= this.mCanvas.height)
 			{
@@ -357,6 +356,7 @@ BoidsController.prototype.updateFromObstacles = function()
 						if( circleIntersect(this.mObstacles[j], this.mBoids[i].mHitPoint) )
 						{
 							this.mBoids[i].mHitPoint.obstacleHitted = true;
+							this.mBoids[i].mHitPoint.obstacleIndex = j; 
 							isFound = true;
 							break;
 						}
@@ -376,13 +376,27 @@ BoidsController.prototype.updateFromObstacles = function()
 	
 	// Calcul du décalage
 	if (this.mDetectionMode == 2)
-	{
-		/*
+	{	
+		var boid = null;
+		var AB, AC;
+		var angle = 0, distance = 0;
 		for (var i = 0; i < this.mBoids.length; i++)
 		{
+			boid = this.mBoids[i];
+			if (boid.mHitPoint.obstacleHitted == false)
+				continue;
 			
+			distance = boid.mHitPoint.distanceHitted;
+			
+			if (distance > 100)
+				continue;
+			
+			AB = {"x": boid.mHitPoint.x - boid.x, "y": boid.mHitPoint.y - boid.y};
+			AC = {"x": this.mObstacles[boid.mHitPoint.obstacleIndex].x - boid.x, "y": this.mObstacles[boid.mHitPoint.obstacleIndex].y - boid.y};
+			boid.mAngle += -Math.vectProduct(AB, AC) * (Math.degToRad(7.5));
+			boid.updateVelocity();
+			boid.updatePosition();
 		}
-		*/
 	}
 };
 
@@ -478,7 +492,7 @@ var Boid = function(x, y, angle, speed, image, color)
 	this.mLastVx = this.vx;
 	this.mLastVy = this.vy;
 	
-	this.mHitPoint = {"x": this.vx * 8, "y": this.vy * 8, "obstacleHitted": false, "distanceHitted": 0.0};
+	this.mHitPoint = {"x": this.vx * 8, "y": this.vy * 8, "obstacleHitted": false, "distanceHitted": 0.0, "obstacleIndex": -1};
 	
 	this.mAngle = angle;
 	this.mSpeed = speed;
@@ -510,7 +524,7 @@ Boid.prototype.updateVelocity = function()
 Boid.prototype.draw = function(ctx, debug, distanceCircle)
 {
 	// Dessin du cercle de distance
-	if (distanceCircle != undefined && distanceCircle != null)
+	if (distanceCircle != undefined && distanceCircle != null && debug == 2)
 	{
 		ctx.beginPath();
 		ctx.arc(this.x, this.y, distanceCircle / 2, 0, 2 * Math.PI, false);
@@ -530,18 +544,13 @@ Boid.prototype.draw = function(ctx, debug, distanceCircle)
 	var C = {"x": this.x + this.vx * 8, "y": this.y + this.vy * 8};
 	var D = {"x": this.x + this.mLastVx * 8, "y": this.y + this.mLastVy * 8};
 	var E = {"x": this.mHitPoint.x, "y": this.mHitPoint.y};
-	var ABx = B.x - A.x;
-	var ABy = B.y - A.y;
-	var ACx = C.x - A.x;
-	var ACy = C.y - A.y;
+	var AB = {"x": B.x - A.x, "y": B.y - A.y};
+	var AC = {"x": C.x - A.x, "y": C.y - A.y};
 	
-	var dot = Math.dotProduct(ABx, ABy, ACx, ACy);
-	var normAB = Math.sqrt(ABx * ABx + ABy * ABy);
-	var normAC = Math.sqrt(ACx * ACx + ACy * ACy);
-	var angleInRad = Math.acos(dot / (normAB * normAC));
+	var angleInRad = Math.calcAngleInRadiansFromVectors(AB, AC);
 	if (C.x < A.x)
 		angleInRad = 2 * Math.PI - angleInRad;
-	var angleInDeg = angleInRad * 180 / Math.PI;
+	var angleInDeg = Math.radToDeg(angleInRad);
 
 	// Calcul du canvas à dessiner (couleur des pixels)
 	var image = getImage(this.mImageName);
@@ -592,7 +601,7 @@ Boid.prototype.draw = function(ctx, debug, distanceCircle)
 	{	
 		if (this.mHitPoint.obstacleHitted == true)
 		{
-			if (this.mHitPoint.distanceHitted < 60)
+			if (this.mHitPoint.distanceHitted < 100)
 				ctx.strokeStyle = "#ffffff";
 			else
 				ctx.strokeStyle = "#ff0000";
@@ -600,7 +609,7 @@ Boid.prototype.draw = function(ctx, debug, distanceCircle)
 		else 
 			ctx.strokeStyle = "#00ff00";
 		ctx.beginPath();
-		ctx.moveTo(A.x, A.y);
+		ctx.moveTo(C.x, C.y);
 		ctx.lineTo(E.x, E.y);
 		ctx.lineWidth = 1;
 		ctx.stroke();
@@ -660,6 +669,17 @@ Math.dotProduct = function(ax, ay, bx, by)
 	return ax * bx + ay * by;
 }
 
+Math.vectProduct = function(v1, v2)
+{
+	var result = v1.x * v2.y - v1.y * v2.x;
+	if (result > 0)
+		return 1;
+	else if (result < 0)
+		return -1;
+		
+	return null;
+}
+
 Math.clamp = function(a, b, c)
 {
 	return Math.max(a, Math.min(b, c));
@@ -668,6 +688,24 @@ Math.clamp = function(a, b, c)
 Math.distance = function(v1, v2)
 {
 	return Math.sqrt((v1.x - v2.x) * (v1.x - v2.x) + (v1.y - v2.y) * (v1.y - v2.y));
+}
+
+Math.calcAngleInRadiansFromVectors = function(v1, v2)
+{
+	var dot = Math.dotProduct(v1.x, v1.y, v2.x, v2.y);
+	var normV1 = Math.sqrt(v1.x * v1.x + v1.y * v1.y);
+	var normV2 = Math.sqrt(v2.x * v2.x + v2.y * v2.y);
+	return Math.acos(dot / (normV1 * normV2));
+}
+
+Math.radToDeg = function(rad)
+{
+	return rad * 180 / Math.PI;
+}
+
+Math.degToRad = function(deg)
+{
+	return deg * Math.PI / 180;
 }
 
 displayTime = function(milliseconds)
@@ -686,7 +724,7 @@ displayTime = function(milliseconds)
 circleIntersect = function(circle, mousePosition)
 {
 	var distancePoint = Math.sqrt((circle.x - mousePosition.x) * (circle.x - mousePosition.x) + (circle.y - mousePosition.y) * (circle.y - mousePosition.y));
-	return (distancePoint <= circle.radius);
+	return (distancePoint <= circle.radius + 2);
 }
 
 
