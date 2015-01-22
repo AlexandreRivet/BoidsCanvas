@@ -138,6 +138,7 @@ BoidsController.prototype.init = function()
 	});
 };
 
+// Création et suppression d'obstacle
 BoidsController.prototype.createObstacle = function(e)
 {
 	var offsetX = e.offsetX;
@@ -179,6 +180,7 @@ BoidsController.prototype.prepareFrame = function()
 	this.mExecutionTime += this.mTimerInterval;
 };
 
+// Mise à jour de la div clock
 BoidsController.prototype.updateClock = function()
 {
 	$("#TimeExecutionValue").html(displayTime(this.mExecutionTime));
@@ -313,8 +315,18 @@ BoidsController.prototype.calc = function()
 	}
 };
 
+// Mise à jour des boids vis à vis des obstacles
 BoidsController.prototype.updateFromObstacles = function()
 {
+	//reset des compportements vis à vis du raycast
+	for (var i = 0; i < this.mBoids.length; i++)
+	{	
+		this.mBoids[i].mHitPoint.obstacleHitted = false;	
+		this.mBoids[i].mHitPoint.distanceHitted = 0.0;
+		this.mBoids[i].mHitPoint.obstacleIndex = -1;
+	}
+	
+	// Mort des boids
 	var boid, obstacle;
 	if(this.mDetectionMode == 1)
 	{
@@ -334,6 +346,7 @@ BoidsController.prototype.updateFromObstacles = function()
 		}
 	}
 	
+	// Calcul du raycast
 	if (this.mDebugMode == 3 || this.mDetectionMode == 2)
 	{
 		var offset = 8, isFound = false;
@@ -343,9 +356,6 @@ BoidsController.prototype.updateFromObstacles = function()
 			offset = 8;
 			this.mBoids[i].mHitPoint.x = this.mBoids[i].x + this.mBoids[i].vx * offset;
 			this.mBoids[i].mHitPoint.y = this.mBoids[i].y + this.mBoids[i].vy * offset;		
-			this.mBoids[i].mHitPoint.obstacleHitted = false;	
-			this.mBoids[i].mHitPoint.distanceHitted = 0.0;
-			this.mBoids[i].mHitPoint.obstacleIndex = -1;
 			while(this.mBoids[i].mHitPoint.x >= 0 && this.mBoids[i].mHitPoint.x <= this.mCanvas.width &&
 				this.mBoids[i].mHitPoint.y >= 0 && this.mBoids[i].mHitPoint.y <= this.mCanvas.height)
 			{
@@ -669,6 +679,7 @@ Math.dotProduct = function(ax, ay, bx, by)
 	return ax * bx + ay * by;
 }
 
+// Fonction générale pour calculer le produit vectoriel
 Math.vectProduct = function(v1, v2)
 {
 	var result = v1.x * v2.y - v1.y * v2.x;
@@ -680,16 +691,19 @@ Math.vectProduct = function(v1, v2)
 	return null;
 }
 
+// Fonction qui clamp une valeur entre deux bornes
 Math.clamp = function(a, b, c)
 {
 	return Math.max(a, Math.min(b, c));
 }
 
+// Fonction de distance entre deux vectors
 Math.distance = function(v1, v2)
 {
 	return Math.sqrt((v1.x - v2.x) * (v1.x - v2.x) + (v1.y - v2.y) * (v1.y - v2.y));
 }
 
+// Fonction qui calcule un angle en radian entre deux vectors
 Math.calcAngleInRadiansFromVectors = function(v1, v2)
 {
 	var dot = Math.dotProduct(v1.x, v1.y, v2.x, v2.y);
@@ -698,16 +712,19 @@ Math.calcAngleInRadiansFromVectors = function(v1, v2)
 	return Math.acos(dot / (normV1 * normV2));
 }
 
+// Fonction qui convertit des radians en degrés
 Math.radToDeg = function(rad)
 {
 	return rad * 180 / Math.PI;
 }
 
+// Fonction qui convertit des degrés en radians
 Math.degToRad = function(deg)
 {
 	return deg * Math.PI / 180;
 }
 
+// Fonction qui formate la clock avec des millisecondes
 displayTime = function(milliseconds)
 {
 	var second = Math.floor(milliseconds / 1000) % 60;
@@ -721,6 +738,7 @@ displayTime = function(milliseconds)
 	return minute + ":" + second;
 }
 
+// Fonction qui retourne si un vector est dans un cercle
 circleIntersect = function(circle, mousePosition)
 {
 	var distancePoint = Math.sqrt((circle.x - mousePosition.x) * (circle.x - mousePosition.x) + (circle.y - mousePosition.y) * (circle.y - mousePosition.y));
